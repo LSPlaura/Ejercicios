@@ -44,7 +44,7 @@ int distribuicion1 = PreguntarAle(ref hombresAle); //dirección
 WriteLine("------");
 var temp4 = int.Parse(PreguntarAle2()); //nº hombres
 WriteLine("------");
-ejerAle[temp4] = distribuicion1;
+ejerAle[temp4] += distribuicion1; //si quieres enviar más hombres al mismo punto pero en otra pregunta se suma en vez de sobreescribe
 
 //grupo 2
 WriteLine("------");
@@ -52,7 +52,7 @@ int distribuicion2 = PreguntarAle(ref hombresAle); //dirección
 WriteLine("------");
 var temp5 = int.Parse(PreguntarAle2()); //nº hombres
 WriteLine("------");
-ejerAle[temp5] = distribuicion2;
+ejerAle[temp5] += distribuicion2;
 
 //grupo 3
 WriteLine("------");
@@ -60,7 +60,7 @@ int distribuicion3 = PreguntarAle(ref hombresAle); //dirección
 WriteLine("------");
 var temp6 = int.Parse(PreguntarAle2()); //nº hombres
 WriteLine("------");
-ejerAle[temp6] = distribuicion3;
+ejerAle[temp6] += distribuicion3;
 
 
 WriteLine("----------------------------");
