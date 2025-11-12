@@ -9,7 +9,7 @@ Configuracion config = InicializarConfig();
 
 //......................................mainFin
 
-void AccionesPersona(Estado[,] tablero){
+void Juego(Estado[,] tablero){
     //revisar si esto no seria manejado por los ciclos
     for (var i = 0; i > config.Dimension; i++)
     {
@@ -20,28 +20,25 @@ void AccionesPersona(Estado[,] tablero){
                 int numI = i;
                 int numJ = j;
                 string zombiePelear = DecidirPeleaZB(tablero, i, j);
-                
-                int.TryParse(zombiePelear.Substring(0, 1), out int fila);
-                int.TryParse(zombiePelear.Substring(0, 1), out int columna);
-                
-                
-                
-                
+
+                if (zombiePelear != "error")
                 {
-                    Luchar();
-                    NuevaPosicion();
+                    int.TryParse(zombiePelear.Substring(0, 1), out int fila);
+                    int.TryParse(zombiePelear.Substring(0, 1), out int columna);
+                
+                    Luchar(tablero, fila, columna);
                 }
+                
+                NuevaPosicion();
+                
 
                 ComprobarPosicion();
-                if (tablero[i - 1, j - 1] = null && tablero[i - 1, j] = null && tablero[i - 1, +1] =
-                        null && tablero[i, j - 1] = null && tablero[i, j + 1] =
-                            null && tablero[i + 1, j - 1] = null && tablero[i + 1, j] =
-                                null && tablero[i + 1, j + 1] = null)
-                {
-                    NuevaPosicion();
-                }
+                NuevaPosicion();
 
 
+            }else if (tablero[i, j] == Estado.Zombie)
+            {
+                //ñlp
             }
         }
     }
@@ -62,12 +59,16 @@ string DecidirPeleaZB(Estado[,] tablero, int x, int y){
                 key = $"{i}:{j},";
                 builder.Append(key);
             }
+            else
+            {
+                return "error";
+            }
         }
     }
     
     string indicesAll = builder.ToString();
-    
-    string[] indicesZB = indicesAll.Split(,)
+
+    string[] indicesZB = indicesAll.Split(",");
     int zombieAMatar = Random.Next(0, indicesZB.Length); //poner el random. y ponerlo bien
     
     return indicesZB[zombieAMatar];
