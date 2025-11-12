@@ -5,13 +5,77 @@ using Virus.Struct;
 
 //......................................main
 
-InicializarConfig();
+Configuracion config = InicializarConfig();
 
 //......................................mainFin
 
+void AccionesPersona(Estado[,] tablero){
+    
+    for (var i = 0; i > config.Dimension; i++)
+    {
+        for (var j = 0; j > config.Dimension; j++)
+        {
+            if (tablero[i, j] == Estado.Persona)
+            {
+                int numI = i;
+                int numJ = j;
+                string zombiePelear = DecidirPeleaZB(tablero, i, j);
+                if (tablero[i - 1, j - 1] = Estado.Zombie || tablero[i - 1, j] = Estado.Zombie || tablero[i - 1, +1] =
+                        Estado.Zombie || tablero[i, j - 1] = Estado.Zombie || tablero[i, j + 1] =
+                            Estado.Zombie || tablero[i + 1, j - 1] = Estado.Zombie || tablero[i + 1, j] =
+                                Estado.Zombie || tablero[i + 1, j + 1] = Estado.Zombie) ;
+                {
+                    Luchar();
+                    NuevaPosicion();
+                }
+
+                ComprobarPosicion();
+                if (tablero[i - 1, j - 1] = null && tablero[i - 1, j] = null && tablero[i - 1, +1] =
+                        null && tablero[i, j - 1] = null && tablero[i, j + 1] =
+                            null && tablero[i + 1, j - 1] = null && tablero[i + 1, j] =
+                                null && tablero[i + 1, j + 1] = null)
+                {
+                    NuevaPosicion();
+                }
+
+
+            }
+        }
+    }
+
+}
+
+string DecidirPeleaZB(Estado[,] tablero, int x, int y){
+     string key = "";
+     var builder = new StringBuilder();
+    
+    // hacer bien el recorrido
+    for (var i = x-1; i > i+1; i++)
+    {
+        for (var j = y-1; j > j+1 ; j++)
+        {
+            if (tablero[i, j] == Estado.Zombie)
+            {
+                key = $"{i}:{j},";
+                builder.Append(key);
+            }
+        }
+    }
+    
+    string indicesAll = builder.ToString();
+    
+    string[] indicesZB = indicesAll.Split(,)
+    int zombieAMatar = Random.Next(0, indicesZB.Length); //poner el random. y ponerlo bien
+    
+    return indicesZB[zombieAMatar];
+}
+
 //...........................................funciones para los párametros introducidos por consola
 
-Configuracion InicializarConfig(string[] args)
+
+
+//controlar nulls. por hacer
+Configuracion InicializarConfig(string?[] args)
 {
     var constructor = new StringBuilder();
 
@@ -54,7 +118,7 @@ Configuracion InicializarConfig(string[] args)
         Contagio = nuevoContagio,
         TiempoMax = nuevoTiempo,
         MuerteZb = nuevaMuerte,
-        MatanzaDeZB = nuevaMatanza,
+        MatanzaDeZb = nuevaMatanza,
     };
 }
 
@@ -91,7 +155,7 @@ Configuracion NuevaConfiguracion()
         Contagio = nuevoContagio,
         TiempoMax = nuevoTiempo,
         MuerteZb = nuevaMuerte,
-        MatanzaDeZB = nuevaMatanza,
+        MatanzaDeZb = nuevaMatanza,
     };
 
 }
@@ -107,8 +171,9 @@ bool ComprobarParametros(string[] args)
     return regex.IsMatch(argsEnString);
 }
 
-string[] ObtenerParametros(string[] args)
+string[] ObtenerParametros(string?[] args)
 {
+    
     string[] nuevoArray = new string[args.Length];
 
     for (var i = 0; i < args.Length; i++)
