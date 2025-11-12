@@ -10,20 +10,23 @@ Configuracion config = InicializarConfig();
 //......................................mainFin
 
 void AccionesPersona(Estado[,] tablero){
-    
+    //revisar si esto no seria manejado por los ciclos
     for (var i = 0; i > config.Dimension; i++)
     {
         for (var j = 0; j > config.Dimension; j++)
         {
-            if (tablero[i, j] == Estado.Persona)
+            if (tablero[i, j] == Estado.Persona) // cannot access non-static field in static context?
             {
                 int numI = i;
                 int numJ = j;
                 string zombiePelear = DecidirPeleaZB(tablero, i, j);
-                if (tablero[i - 1, j - 1] = Estado.Zombie || tablero[i - 1, j] = Estado.Zombie || tablero[i - 1, +1] =
-                        Estado.Zombie || tablero[i, j - 1] = Estado.Zombie || tablero[i, j + 1] =
-                            Estado.Zombie || tablero[i + 1, j - 1] = Estado.Zombie || tablero[i + 1, j] =
-                                Estado.Zombie || tablero[i + 1, j + 1] = Estado.Zombie) ;
+                
+                int.TryParse(zombiePelear.Substring(0, 1), out int fila);
+                int.TryParse(zombiePelear.Substring(0, 1), out int columna);
+                
+                
+                
+                
                 {
                     Luchar();
                     NuevaPosicion();
