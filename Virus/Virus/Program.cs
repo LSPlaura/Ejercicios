@@ -184,4 +184,4 @@ string[] ObtenerParametros(string?[] args)
         nuevoArray[i] = valor;
     }
     return nuevoArray;
-} */    
+} */    f
