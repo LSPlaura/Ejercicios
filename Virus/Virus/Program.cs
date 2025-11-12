@@ -18,6 +18,9 @@ Estado[,] tablero2= CopiarTablero(tablero1);
 
 //......................................mainFin
 
+// por hacer: funciones de los estados, control de nulls, inicializar el tablero, la lógica y funciones del buffer (copiar, swap), añadir el logger
+
+//refactorizar para que se use tablero de escritura y de lectura
 void Juego(Estado[,] tablero)
 {
     int ciclos = 0;
@@ -34,7 +37,7 @@ void Juego(Estado[,] tablero)
                     int numJ = j;
                     string zombiePelear = DecidirPeleaZB(tablero, i, j);
 
-                    if (zombiePelear != "error")
+                    if (zombiePelear != "error") //???
                     {
                         int.TryParse(zombiePelear.Substring(0, 1), out int fila);
                         int.TryParse(zombiePelear.Substring(0, 1), out int columna);
@@ -66,31 +69,31 @@ string DecidirPeleaZB(Estado[,] tablero, int x, int y){
      var builder = new StringBuilder();
      int contadorZB = 0;
     
-    // hacer bien el recorrido
+    //recorro desde la posicion de la persona las 8 casillas adyacentes
     for (var i = x-1; i > i+1; i++)
     {
         for (var j = y-1; j > j+1 ; j++)
         {
-            if (tablero[i, j] == Estado.Zombie)
+            if (tablero[i, j] == Estado.Zombie) //si en una de esas casillas hay un zombie
             {
                 contadorZB += 1;
                 key = $"{i}:{j},";
-                builder.Append(key);
+                builder.Append(key); //añado la variable key (fila:columna, == indice) al StringBuilder usando , como posterior delimitador y : por claridad
             }
         }
     }
     
     if (contadorZB == 0)
     {
-        return "error";
+        return "error"; 
     }
     
-    string indicesAll = builder.ToString();
+    string indicesAll = builder.ToString(); //obtengo el string completo
 
-    string[] indicesZB = indicesAll.Split(",");
-    int zombieAMatar = Random.Next(0, indicesZB.Length); //poner el random. y ponerlo bien
+    string[] indicesZB = indicesAll.Split(","); //creo un array de strings de las posiciones en las que están los zombies
+    int zombieAMatar = Random.Next(0, indicesZB.Length); //(poner el random bien) obtengo el indice de ese array que va a ser el zombie con el que la persona pelee
     
-    return indicesZB[zombieAMatar];
+    return indicesZB[zombieAMatar]; //devuelvo el valor del indice (string fila:columna)
 }
 
 //...........................................funciones para los párametros introducidos por consola
