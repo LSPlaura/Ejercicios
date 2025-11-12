@@ -76,8 +76,6 @@ string DecidirPeleaZB(Estado[,] tablero, int x, int y){
 
 //...........................................funciones para los párametros introducidos por consola
 
-
-
 //controlar nulls. por hacer
 Configuracion InicializarConfig(string?[] args)
 {
