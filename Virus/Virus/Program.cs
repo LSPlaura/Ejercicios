@@ -4,50 +4,67 @@ using static System.Console;
 using Virus.Struct;
 
 //......................................main
+// variables que necesito para funciones/procedimientos
+var random = Random();
 
 Configuracion config = InicializarConfig();
 
+Estado[,] tablero1 = new Estado[config.Dimension,config.Dimension];
+
+InicializarTablero();
+
+Estado[,] tablero2= CopiarTablero(tablero1);
+
+
 //......................................mainFin
 
-void Juego(Estado[,] tablero){
-    //revisar si esto no seria manejado por los ciclos
-    for (var i = 0; i > config.Dimension; i++)
+void Juego(Estado[,] tablero)
+{
+    int ciclos = 0;
+
+    while (ciclos < config.TiempoMax)
     {
-        for (var j = 0; j > config.Dimension; j++)
+        for (var i = 0; i > config.Dimension; i++)
         {
-            if (tablero[i, j] == Estado.Persona) // cannot access non-static field in static context?
+            for (var j = 0; j > config.Dimension; j++)
             {
-                int numI = i;
-                int numJ = j;
-                string zombiePelear = DecidirPeleaZB(tablero, i, j);
-
-                if (zombiePelear != "error")
+                if (tablero[i, j] == Estado.Persona) // cannot access non-static field in static context?
                 {
-                    int.TryParse(zombiePelear.Substring(0, 1), out int fila);
-                    int.TryParse(zombiePelear.Substring(0, 1), out int columna);
-                
-                    Luchar(tablero, fila, columna);
+                    int numI = i;
+                    int numJ = j;
+                    string zombiePelear = DecidirPeleaZB(tablero, i, j);
+
+                    if (zombiePelear != "error")
+                    {
+                        int.TryParse(zombiePelear.Substring(0, 1), out int fila);
+                        int.TryParse(zombiePelear.Substring(0, 1), out int columna);
+
+                        Luchar(tablero, fila, columna);
+                    }
+                    else
+                    {
+                        NuevaPosicion();
+                    }
+
+
+
                 }
-                
-                NuevaPosicion();
-                
-
-                ComprobarPosicion();
-                NuevaPosicion();
-
-
-            }else if (tablero[i, j] == Estado.Zombie)
-            {
-                //ñlp
+                else if (tablero[i, j] == Estado.Zombie)
+                {
+                    //ñlp
+                }
             }
         }
-    }
+
+        ciclos += 1;
+    } 
 
 }
 
 string DecidirPeleaZB(Estado[,] tablero, int x, int y){
      string key = "";
      var builder = new StringBuilder();
+     int contadorZB = 0;
     
     // hacer bien el recorrido
     for (var i = x-1; i > i+1; i++)
@@ -56,14 +73,16 @@ string DecidirPeleaZB(Estado[,] tablero, int x, int y){
         {
             if (tablero[i, j] == Estado.Zombie)
             {
+                contadorZB += 1;
                 key = $"{i}:{j},";
                 builder.Append(key);
             }
-            else
-            {
-                return "error";
-            }
         }
+    }
+    
+    if (contadorZB == 0)
+    {
+        return "error";
     }
     
     string indicesAll = builder.ToString();
