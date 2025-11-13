@@ -11,7 +11,7 @@ Configuracion config = InicializarConfig();
 
 Estado[,] tablero1 = new Estado[config.Dimension,config.Dimension];
 
-IniciarTablero(Estado[,] tablero);
+IniciarTablero(Estado[,] tablero1);
 
 Estado[,] tablero2= new Estado[config.Dimension,config.Dimension];
 CopiarTablero(tablero1, tablero2);
@@ -19,7 +19,7 @@ CopiarTablero(tablero1, tablero2);
 
 //......................................mainFin
 
-// por hacer: funciones de los estados, control de nulls, inicializar el tablero, la lógica y funciones del buffer (copiar, swap), añadir el logger
+// por hacer: funciones de los estados, control de nulls, la lógica y funciones del buffer (copiar, swap), añadir el logger
 
 //refactorizar para que se use tablero de escritura y de lectura
 
@@ -60,6 +60,8 @@ void CopiarTablero(Estado[,]tableroA, Estado[,]tableroB)
     }
 }
 
+
+
 void Juego(Estado[,] tablero)
 {
     int ciclos = 0;
@@ -85,7 +87,7 @@ void Juego(Estado[,] tablero)
                     }
                     else
                     {
-                        NuevaPosicion();
+                        PersonaAvance();
                     }
 
 
@@ -103,6 +105,22 @@ void Juego(Estado[,] tablero)
 
 }
 
+void ZombieMuerte()
+{
+    
+}
+
+void ZombieContagio()
+{
+    
+}
+
+void ZombieAvance()
+{
+    
+}
+
+//PDU repensar
 string DecidirPeleaZB(Estado[,] tablero, int x, int y){
      string key = "";
      var builder = new StringBuilder();
