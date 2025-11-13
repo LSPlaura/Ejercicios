@@ -1,17 +1,19 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 using static System.Console;
-using Virus.Struct;
+using Virus.Structs;
 
 //......................................main
 // variables que necesito para funciones/procedimientos
 var random = Random();
 
-Configuracion config = InicializarConfig();
+Estado estado =  new Estado { Zombie = 0, Persona = 1 };
+
+Configuracion config = InicializarConfig(args);
 
 Estado[,] tablero1 = new Estado[config.Dimension,config.Dimension];
 
-IniciarTablero(Estado[,] tablero1);
+IniciarTablero(tablero1);
 
 Estado[,] tablero2= new Estado[config.Dimension,config.Dimension];
 CopiarTablero(tablero1, tablero2);
@@ -36,7 +38,7 @@ void IniciarTablero(Estado[,] tablero)
             {
                 if (prob >= 0 && prob < 33)
                 {
-                    tablero[i, j] = Estado.Zombie;
+                    tablero[i, j] = estado.Zombie;
                     numZB += 1;
                 }
                 else if (prob >= 33 && prob < 66)
@@ -74,8 +76,6 @@ void Juego(Estado[,] tablero)
             {
                 if (tablero[i, j] == Estado.Persona)
                 {
-                    int numI = i;
-                    int numJ = j;
                     string zombiePelear = DecidirPeleaZB(tablero, i, j);
 
                     if (zombiePelear != "error") //???
@@ -95,7 +95,12 @@ void Juego(Estado[,] tablero)
                 }
                 else if (tablero[i, j] == Estado.Zombie)
                 {
-                    //ñlp
+                    ZombieMuerte(tablero1, i, j);
+                    if (tablero[i, j] is Estado.Zombie)
+                    {
+                        ZombieContagio();
+                        ZombieAvance();
+                    }
                 }
             }
         }
@@ -105,17 +110,26 @@ void Juego(Estado[,] tablero)
 
 }
 
-void ZombieMuerte()
+void ZombieMuerte(Estado[,] tablero, int x, int y)
 {
     
 }
 
-void ZombieContagio()
+void ZombieContagio(Estado[,] tablero, int x, int y)
 {
     
 }
 
-void ZombieAvance()
+void ZombieAvance(Estado[,] tablero, int x, int y)
+{
+    
+}
+
+void PersonaAvance(Estado[,] tablero, int x, int y)
+{
+    
+}
+
 {
     
 }

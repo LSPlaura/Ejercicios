@@ -1,4 +1,4 @@
-﻿namespace Virus.Struct
+﻿namespace Virus.Structs
 {
     public struct Configuracion
     { 
