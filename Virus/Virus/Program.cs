@@ -11,9 +11,10 @@ Configuracion config = InicializarConfig();
 
 Estado[,] tablero1 = new Estado[config.Dimension,config.Dimension];
 
-InicializarTablero();
+IniciarTablero(Estado[,] tablero);
 
-Estado[,] tablero2= CopiarTablero(tablero1);
+Estado[,] tablero2= new Estado[config.Dimension,config.Dimension];
+CopiarTablero(tablero1, tablero2);
 
 
 //......................................mainFin
@@ -21,6 +22,44 @@ Estado[,] tablero2= CopiarTablero(tablero1);
 // por hacer: funciones de los estados, control de nulls, inicializar el tablero, la lógica y funciones del buffer (copiar, swap), añadir el logger
 
 //refactorizar para que se use tablero de escritura y de lectura
+
+void IniciarTablero(Estado[,] tablero)
+{
+    int numZB = 0;
+    int personas = 0;
+    int prob = random.Next(0, 100);
+    while (numZB < config.Infectados || personas < config.Sanos)
+    {
+        for(var i = 0; i < tablero.GetLength(0); i++)
+        {
+            for (var j = 0; j < tablero.GetLength(1); j++)
+            {
+                if (prob >= 0 && prob < 33)
+                {
+                    tablero[i, j] = Estado.Zombie;
+                    numZB += 1;
+                }
+                else if (prob >= 33 && prob < 66)
+                {
+                    tablero[i, j] = Estado.Persona;
+                    personas += 1;
+                }
+            }
+        }
+    }
+}
+
+void CopiarTablero(Estado[,]tableroA, Estado[,]tableroB)
+{
+    for (var i = 0; i < tableroA.GetLength(0); i++)
+    {
+        for (var j = 0; j < tableroA.GetLength(1); j++)
+        {
+            tableroA[i, j] = tableroB[i, j];
+        }
+    }
+}
+
 void Juego(Estado[,] tablero)
 {
     int ciclos = 0;
@@ -31,7 +70,7 @@ void Juego(Estado[,] tablero)
         {
             for (var j = 0; j > config.Dimension; j++)
             {
-                if (tablero[i, j] == Estado.Persona) // cannot access non-static field in static context?
+                if (tablero[i, j] == Estado.Persona)
                 {
                     int numI = i;
                     int numJ = j;
