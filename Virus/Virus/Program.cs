@@ -97,8 +97,8 @@ void Juego(Estado[,] tablero)
                     ZombieMuerte(tablero1, i, j);
                     if (tablero[i, j] is Estado.Zombie)
                     {
-                        ZombieContagio();
-                        ZombieAvance();
+                        ZombieContagio(tablero1, i, j);
+                        ZombieAvance(tablero1, i, j);
                     }
                 }
             }
@@ -109,8 +109,13 @@ void Juego(Estado[,] tablero)
 
 }
 
-void ZombieMuerte(Estado[,] tablero, int x, int y)
+void ZombieMuerte(Estado?[,] tablero, int x, int y)
 {
+    int prob = random(0, 100);
+    if (prob >= 0 && prob < config.Contagio)
+    {
+        tablero[x, y] = null;
+    }
     
 }
 
@@ -129,8 +134,31 @@ void PersonaAvance(Estado[,] tablero, int x, int y)
     
 }
 
+Estado[] DarPosiciones(Estado[,] tablero, int x, int y)
 {
-    
+    Estado[] posicionesIndice =  new Estado[8];
+    for (var i = x - 1; i > i + 1; i++)
+    {
+        for (var j = y - 1; j > j + 1; j++)
+        {
+            posicionesIndice[j] = tablero[i, j];
+        }
+    }
+
+    if (posicionesIndice.Length != 8)
+    {
+        var l = posicionesIndice.Length;
+        Array.Resize(ref posicionesIndice, l);
+    }
+    return posicionesIndice;
+}
+//pensar
+Estado[] PosicionesLibres(Estado[,] tablero, Estado[] posiciponesIndice)
+{
+    for (var i = 0; i < posiciponesIndice.Length; i++)
+    {
+        if ()
+    } 
 }
 
 //PDU repensar
