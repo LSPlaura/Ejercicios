@@ -1,13 +1,12 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 using static System.Console;
+using Virus.Enums;
 using Virus.Structs;
 
 //......................................main
 // variables que necesito para funciones/procedimientos
 var random = Random();
-
-Estado estado =  new Estado { Zombie = 0, Persona = 1 };
 
 Configuracion config = InicializarConfig(args);
 
@@ -38,7 +37,7 @@ void IniciarTablero(Estado[,] tablero)
             {
                 if (prob >= 0 && prob < 33)
                 {
-                    tablero[i, j] = estado.Zombie;
+                    tablero[i, j] = Estado.Zombie;
                     numZB += 1;
                 }
                 else if (prob >= 33 && prob < 66)
