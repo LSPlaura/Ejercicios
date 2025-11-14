@@ -8,15 +8,12 @@ using Virus.Structs;
 // variables que necesito para funciones/procedimientos
 var random = Random();
 
-int?[][] posicionesPersonas = new int?[9][];
-int?[][] posicionesZB = new int?[9][];
-int?[][]posicionesVacias = new int?[9][];
-
 Configuracion config = InicializarConfig(args);
 
 Estado[,] tablero1 = new Estado[config.Dimension,config.Dimension];
 
 IniciarTablero(tablero1);
+Juego();
 
 Estado[,] tablero2= new Estado[config.Dimension,config.Dimension];
 CopiarTablero(tablero1, tablero2);
@@ -27,6 +24,27 @@ CopiarTablero(tablero1, tablero2);
 // por hacer: funciones de los estados, control de nulls, la lógica y funciones del buffer (copiar, swap), añadir el logger
 
 //refactorizar para que se use tablero de escritura y de lectura
+
+void ImprimirTablero(Estado?[,] tablero)
+{
+    for (var i = 0; i < tablero.GetLength(0); i++)
+    {
+        for (var j = 0; j < tablero.GetLength(1); j++)
+        {
+            if (tablero[i, j] == Estado.Persona)
+            {
+                Write($"[x]")
+            }else if (tablero[i, j] == Estado.Persona)
+            {
+                Write($"[o]")
+            }
+            else
+            {
+                Write($"[ ]");
+            }
+        }
+    }
+}
 
 void IniciarTablero(Estado[,] tablero)
 {
@@ -136,35 +154,6 @@ void ZombieAvance(Estado[,] tablero, int x, int y)
 void PersonaAvance(Estado[,] tablero, int x, int y)
 {
     
-}
-
-void DarPosiciones(Estado[,] tablero, int x, int y, int?[] posicionesPersonas, int?[] posicionesZB, int?[] posicionesVacias)
-{
-    int contadorPersonas = 0;
-    int contadorZB = 0;
-    int contadorVacias = 0;
-    for (var i = x - 1; i > i + 1; i++)
-    {
-        for (var j = y - 1; j > j + 1; j++)
-        {
-            
-            if (tablero[i, j] == Estado.Persona)
-            {
-                posicionesPersonas[contadorPersonas] = int?[] [i, j];
-                contadorPersonas += 1;
-            }else if (tablero[i, j] == Estado.Zombie)
-            {
-                posicionesPersonas[contadorZB] = int?[] {i, j};
-                contadorZB += 1;
-            }
-            else
-            {
-                posicionesPersonas[contadorVacias] = new { i, j };
-                contadorVacias += 1;
-            }
-            
-        }
-    }
 }
 
 //PDU repensar
@@ -310,4 +299,4 @@ string[] ObtenerParametros(string?[] args)
         nuevoArray[i] = valor;
     }
     return nuevoArray;
-} */    f
+}
