@@ -8,6 +8,10 @@ using Virus.Structs;
 // variables que necesito para funciones/procedimientos
 var random = Random();
 
+int?[][] posicionesPersonas = new int?[9][];
+int?[][] posicionesZB = new int?[9][];
+int?[][]posicionesVacias = new int?[9][];
+
 Configuracion config = InicializarConfig(args);
 
 Estado[,] tablero1 = new Estado[config.Dimension,config.Dimension];
@@ -134,31 +138,33 @@ void PersonaAvance(Estado[,] tablero, int x, int y)
     
 }
 
-Estado[] DarPosiciones(Estado[,] tablero, int x, int y)
+void DarPosiciones(Estado[,] tablero, int x, int y, int?[] posicionesPersonas, int?[] posicionesZB, int?[] posicionesVacias)
 {
-    Estado[] posicionesIndice =  new Estado[8];
+    int contadorPersonas = 0;
+    int contadorZB = 0;
+    int contadorVacias = 0;
     for (var i = x - 1; i > i + 1; i++)
     {
         for (var j = y - 1; j > j + 1; j++)
         {
-            posicionesIndice[j] = tablero[i, j];
+            
+            if (tablero[i, j] == Estado.Persona)
+            {
+                posicionesPersonas[contadorPersonas] = int?[] [i, j];
+                contadorPersonas += 1;
+            }else if (tablero[i, j] == Estado.Zombie)
+            {
+                posicionesPersonas[contadorZB] = int?[] {i, j};
+                contadorZB += 1;
+            }
+            else
+            {
+                posicionesPersonas[contadorVacias] = new { i, j };
+                contadorVacias += 1;
+            }
+            
         }
     }
-
-    if (posicionesIndice.Length != 8)
-    {
-        var l = posicionesIndice.Length;
-        Array.Resize(ref posicionesIndice, l);
-    }
-    return posicionesIndice;
-}
-//pensar
-Estado[] PosicionesLibres(Estado[,] tablero, Estado[] posiciponesIndice)
-{
-    for (var i = 0; i < posiciponesIndice.Length; i++)
-    {
-        if ()
-    } 
 }
 
 //PDU repensar
