@@ -135,31 +135,6 @@ void Juego(Estado[,] tablero)
 
 }
 
-void ZombieMuerte(Estado?[,] tablero, int x, int y)
-{
-    int prob = random(0, 100);
-    if (prob >= 0 && prob < config.Contagio)
-    {
-        tablero[x, y] = null;
-    }
-    
-}
-
-void ZombieContagio(Estado[,] tablero, int x, int y)
-{
-    
-}
-
-void ZombieAvance(Estado[,] tablero, int x, int y)
-{
-    
-}
-
-void PersonaAvance(Estado[,] tablero, int x, int y)
-{
-    
-}
-
 string[] ObtenerPosiciones(Estado?[,] tablero, int x, int y)
 {
     var builder = new StringBuilder();
@@ -202,55 +177,58 @@ void DarPosiciones(Estado?[,] tablero, string[] indices)
     }
 }
 
-void Luchar(Estado?[,] tablero, string[]posicionesZB)
+void Luchar(Estado?[,] tablero, string[]posiciones)
 {
     int prob = random.Next(0, 100);
-    int elegido = random.Next(0, 2);
+    int elegido = random.Next(0, posiciones.Length-1);
     if (prob >= 0 && prob < config.MatanzaDeZb)
     {
-        int fila = int.Parse(posicionesZB[elegido].Substring(0, 1));
-        int columna = int.Parse(posicionesZB[elegido].Substring(2, 1));
+        int fila = int.Parse(posiciones[elegido].Substring(0, 1));
+        int columna = int.Parse(posiciones[elegido].Substring(2, 1));
         tablero[fila, columna] = null;
     }
 }
 
-
-//PDU repensar
-string DecidirPeleaZB(Estado[,] tablero, int x, int y){
-     string key = "";
-     var builder = new StringBuilder();
-     int contadorZB = 0;
+void Avanzar(Estado?[,] tablero, string[] posiciones, int x, int y)
+{
+    int nuevaPosicion = random.Next(0, posiciones.Length-1);
+    int fila = int.Parse(posicionesZB[nuevaPosicion].Substring(0, 1));
+    int columna = int.Parse(posicionesZB[nuevaPosicion].Substring(2, 1));
     
-    //recorro desde la posicion de la persona las 8 casillas adyacentes
-    for (var i = x-1; i > i+1; i++)
+    if (tablero[x, y].HasValue)
     {
-        for (var j = y-1; j > j+1 ; j++)
-        {
-            if (tablero[i, j] == Estado.Zombie) //si en una de esas casillas hay un zombie
-            {
-                contadorZB += 1;
-                key = $"{i}:{j},";
-                builder.Append(key); //añado la variable key (fila:columna, == indice) al StringBuilder usando , como posterior delimitador y : por claridad
-            }
-        }
+        Estado? coso = tablero[x, y];
+        tablero[x, y] = null;
+        tablero[fila, columna] = coso;
     }
-    
-    if (contadorZB == 0)
-    {
-        return "error"; 
-    }
-    
-    string indicesAll = builder.ToString(); //obtengo el string completo
-
-    string[] indicesZB = indicesAll.Split(","); //creo un array de strings de las posiciones en las que están los zombies
-    int zombieAMatar = Random.Next(0, indicesZB.Length); //(poner el random bien) obtengo el indice de ese array que va a ser el zombie con el que la persona pelee
-    
-    return indicesZB[zombieAMatar]; //devuelvo el valor del indice (string fila:columna)
 }
 
-//...........................................funciones para los párametros introducidos por consola
+void ZombieMuerte(Estado?[,] tablero, int x, int y)
+{
+    int prob = random(0, 100);
+    if (prob >= 0 && prob < config.MuerteZb)
+    {
+        tablero[x, y] = null;
+    }
+    
+}
 
+void ZombieContagio(Estado?[,] tablero, string[] posiciones, int x, int y)
+{
+    for (var i = 0; i < posiciones.Length; i++)
+    {
+        int prob = random.Next(0, 100);
+        int fila = int.Parse(posiciones[i].Substring(0, 1));
+        int columna = int.Parse(posiciones[i].Substring(2, 1));
+        if (prob >= 0 && prob < config.Contagio)
+        {
+            tablero[fila, columna] = Estado.Persona;
+        }
+    }
+
+//...........................................funciones para los párametros introducidos por consola
 //controlar nulls. por hacer
+
 Configuracion InicializarConfig(string?[] args)
 {
     var constructor = new StringBuilder();
