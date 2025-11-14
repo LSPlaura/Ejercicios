@@ -8,6 +8,10 @@ using Virus.Structs;
 // variables que necesito para funciones/procedimientos
 var random = Random();
 
+string[] posicionesPersonas = new string[8];
+string[] posicionesZB = new string[8];
+string[] posicionesVacias = new string[8];
+
 Configuracion config = InicializarConfig(args);
 
 Estado[,] tablero1 = new Estado[config.Dimension,config.Dimension];
@@ -164,6 +168,10 @@ string[] ObtenerPosiciones(Estado?[,] tablero, int x, int y)
     {
         for (var j = y - 1; j > j + 1; j++)
         {
+            if (i == x && j == y)
+            {
+                continue;
+            }
             builder.Append($"{i}:{j},");
         }
     }
@@ -175,14 +183,36 @@ string[] ObtenerPosiciones(Estado?[,] tablero, int x, int y)
 
 void DarPosiciones(Estado?[,] tablero, string[] indices)
 {
-    foreach (var indice in indices)
+    for(var i = 0; i<indices.Length; i++)
     {
-        int fila = int.Parse(indice.Substring(0, 1));
-        int columna = int.Parse(indice.Substring(2, 1));
-        if 
+        int fila = int.Parse(indices[i].Substring(0, 1));
+        int columna = int.Parse(indices[i].Substring(2, 1));
+        if (tablero[fila, columna] == Estado.Zombie)
+        {
+            posicionesZB[i] = indices[i];
+        }
+        if (tablero[fila, columna] == Estado.Persona)
+        {
+            posicionesPersonas[i] = indices[i];
+        }
+        else
+        {
+            posicionesVacias[i] = indices[i];
+        }
     }
 }
 
+void Luchar(Estado?[,] tablero, string[]posicionesZB)
+{
+    int prob = random.Next(0, 100);
+    int elegido = random.Next(0, 2);
+    if (prob >= 0 && prob < config.MatanzaDeZb)
+    {
+        int fila = int.Parse(posicionesZB[elegido].Substring(0, 1));
+        int columna = int.Parse(posicionesZB[elegido].Substring(2, 1));
+        tablero[fila, columna] = null;
+    }
+}
 
 
 //PDU repensar
