@@ -6,7 +6,7 @@ using Virus.Structs;
 
 //......................................main
 // variables que necesito para funciones/procedimientos
-var random = Random();
+var random = new Random();
 
 string[] posicionesPersonas = new string[8];
 string[] posicionesZB = new string[8];
@@ -40,7 +40,7 @@ void ImprimirTablero(Estado?[,] tablero)
                 Write($"[x]")
             }else if (tablero[i, j] == Estado.Persona)
             {
-                Write($"[o]")
+                Write($"[o]");
             }
             else
             {
@@ -82,14 +82,14 @@ void CopiarTablero(Estado[,]tableroA, Estado[,]tableroB)
     {
         for (var j = 0; j < tableroA.GetLength(1); j++)
         {
-            tableroA[i, j] = tableroB[i, j];
+            tableroB[i, j] = tableroA[i, j];
         }
     }
 }
 
 
 
-void Juego(Estado[,] tablero)
+void JuegoCiclo(Estado[,] tablero)
 {
     int ciclos = 0;
 
@@ -101,22 +101,7 @@ void Juego(Estado[,] tablero)
             {
                 if (tablero[i, j] == Estado.Persona)
                 {
-                    string zombiePelear = DecidirPeleaZB(tablero, i, j);
-
-                    if (zombiePelear != "error") //???
-                    {
-                        int.TryParse(zombiePelear.Substring(0, 1), out int fila);
-                        int.TryParse(zombiePelear.Substring(0, 1), out int columna);
-
-                        Luchar(tablero, fila, columna);
-                    }
-                    else
-                    {
-                        PersonaAvance();
-                    }
-
-
-
+                    
                 }
                 else if (tablero[i, j] == Estado.Zombie)
                 {
@@ -124,15 +109,22 @@ void Juego(Estado[,] tablero)
                     if (tablero[i, j] is Estado.Zombie)
                     {
                         ZombieContagio(tablero1, i, j);
-                        ZombieAvance(tablero1, i, j);
                     }
                 }
             }
         }
 
         ciclos += 1;
+        Swap(tablero1, tablero2);
     } 
 
+}
+
+void Swap(Estado?[] tablero1, Estado?[] tablero2)
+{
+    var temp = tablero1;
+    tablero1 = tablero2;
+    tablero2 = temp;
 }
 
 string[] ObtenerPosiciones(Estado?[,] tablero, int x, int y)
@@ -225,6 +217,7 @@ void ZombieContagio(Estado?[,] tablero, string[] posiciones, int x, int y)
             tablero[fila, columna] = Estado.Persona;
         }
     }
+}
 
 //...........................................funciones para los párametros introducidos por consola
 //controlar nulls. por hacer
