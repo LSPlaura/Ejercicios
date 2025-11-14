@@ -156,6 +156,35 @@ void PersonaAvance(Estado[,] tablero, int x, int y)
     
 }
 
+string[] ObtenerPosiciones(Estado?[,] tablero, int x, int y)
+{
+    var builder = new StringBuilder();
+
+    for (var i = x - 1; i > i + 1; i++)
+    {
+        for (var j = y - 1; j > j + 1; j++)
+        {
+            builder.Append($"{i}:{j},");
+        }
+    }
+    string indicesString = builder.ToString();
+    string[] indicesArray = indicesString.Split(",");
+    
+    return indicesArray;
+}
+
+void DarPosiciones(Estado?[,] tablero, string[] indices)
+{
+    foreach (var indice in indices)
+    {
+        int fila = int.Parse(indice.Substring(0, 1));
+        int columna = int.Parse(indice.Substring(2, 1));
+        if 
+    }
+}
+
+
+
 //PDU repensar
 string DecidirPeleaZB(Estado[,] tablero, int x, int y){
      string key = "";
