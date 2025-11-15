@@ -3,9 +3,12 @@ using System.Text.RegularExpressions;
 using static System.Console;
 using Virus.Enums;
 using Virus.Structs;
+using System;
 
 //......................................main
 // variables que necesito para funciones/procedimientos
+
+var random = Random.Shared;
 
 string[] posicionesPersonas = new string[8];
 string[] posicionesZB = new string[8];
@@ -14,14 +17,12 @@ string[] posicionesVacias = new string[8];
 Configuracion config = InicializarConfig(args);
 
 Estado?[,] tablero1 = new Estado?[config.Dimension,config.Dimension];
-
 IniciarTablero(tablero1);
-
 Estado?[,] tablero2= new Estado?[config.Dimension,config.Dimension];
 
 CopiarTablero(tablero1, tablero2);
 
-Juego(tablero1, tablero2, posicionesPersonas, posicionesZB,  posicionesVacias);
+Juego(tablero1, tablero2, posicionesPersonas, posicionesZB, posicionesVacias);
 
 
 //......................................mainFin
@@ -37,7 +38,8 @@ void ImprimirTablero(Estado?[,] tablero)
             if (tablero[i, j] == Estado.Persona)
             {
                 Write($"[x]");
-            }else if (tablero[i, j] == Estado.Persona)
+                
+            }else if (tablero[i, j] == Estado.Zombie)
             {
                 Write($"[o]");
             }
@@ -46,30 +48,36 @@ void ImprimirTablero(Estado?[,] tablero)
                 Write($"[ ]");
             }
         }
+        WriteLine("");
     }
 }
 
 void IniciarTablero(Estado?[,] tablero)
 {
-    int numZB = 0;
-    int personas = 0;
-    int prob = random.Next(0, 100);
-    while (numZB < config.Infectados || personas < config.Sanos)
+    int numZB = 0; // cuento el num de ZB que hay
+    int personas = 0; // cuento el num de personas que hay
+    while (numZB < config.Infectados && personas < config.Sanos)
     {
-        for(var i = 0; i < tablero.GetLength(0); i++)
+        for (var i = 0; i < tablero.GetLength(0); i++)
         {
             for (var j = 0; j < tablero.GetLength(1); j++)
             {
-                if (prob >= 0 && prob < 33)
+                int prob = random.Next(0, 100); //obtengo un num random entre 0-100
+                if (prob >= 0 && prob < 33 && numZB < config.Infectados)
                 {
                     tablero[i, j] = Estado.Zombie;
                     numZB += 1;
                 }
-                else if (prob >= 33 && prob < 66)
+                else if (prob >= 33 && prob < 66 && personas < config.Sanos)
                 {
                     tablero[i, j] = Estado.Persona;
                     personas += 1;
                 }
+                else
+                {
+                    tablero[i, j] = null;
+                }
+           
             }
         }
     }
@@ -95,11 +103,11 @@ void Juego(Estado?[,] leer, Estado?[,] escribir, string[] posPer, string[] posZB
     while (ciclos < config.TiempoMax)
     {
         ImprimirTablero(leer);
-        for (var i = 0; i > config.Dimension; i++)
+        for (var i = 0; i < config.Dimension; i++)
         {
-            for (var j = 0; j > config.Dimension; j++)
+            for (var j = 0; j < config.Dimension; j++)
             {
-                string[] indices = ObtenerPosiciones(leer, i, j);
+                string[] indices = ObtenerPosiciones(i, j);
                 DarPosiciones(leer, indices);
                 if (leer[i, j] == Estado.Persona)
                 {
@@ -111,7 +119,7 @@ void Juego(Estado?[,] leer, Estado?[,] escribir, string[] posPer, string[] posZB
                     ZombieMuerte(escribir, i, j);
                     if (escribir[i, j] is Estado.Zombie)
                     {
-                        ZombieContagio(escribir, posPer, i, j);
+                        ZombieContagio(escribir, posPer);
                         Avanzar(escribir, posVac, i, j);
                     }
                 }
@@ -139,13 +147,13 @@ void Swap(ref Estado?[,] tableroA, ref Estado?[,] tableroB)
     tableroB = temp;
 }
 
-string[] ObtenerPosiciones(Estado?[,] tablero, int x, int y)
+string[] ObtenerPosiciones(int x, int y)
 {
     var builder = new StringBuilder();
 
-    for (var i = x - 1; i > i + 1; i++)
+    for (var i = x - 1; i > 1; i++)
     {
-        for (var j = y - 1; j > j + 1; j++)
+        for (var j = y - 1; j > 1; j++)
         {
             if (i == x && j == y)
             {
@@ -162,7 +170,7 @@ string[] ObtenerPosiciones(Estado?[,] tablero, int x, int y)
 
 void DarPosiciones(Estado?[,] tablero, string[] indices)
 {
-    for(var i = 0; i<indices.Length; i++)
+    for(var i = 0; i < indices.Length -2; i++)
     {
         int fila = int.Parse(indices[i].Substring(0, 1));
         int columna = int.Parse(indices[i].Substring(2, 1));
@@ -214,12 +222,16 @@ int ContarZB(Estado?[,] tablero, string[] posiciones)
 
 void Avanzar(Estado?[,] tablero, string[] posiciones, int x, int y)
 {
+    //me da un número aleatorio de un array de índices cuyos valores son las posiciones adyaccentes vacías posibles
     int nuevaPosicion = random.Next(0, posiciones.Length-1);
-    int fila = int.Parse(posicionesZB[nuevaPosicion].Substring(0, 1));
-    int columna = int.Parse(posicionesZB[nuevaPosicion].Substring(2, 1));
+    int fila = int.Parse(posiciones[nuevaPosicion].Substring(0, 1));
+    int columna = int.Parse(posiciones[nuevaPosicion].Substring(2, 1));
     
     if (tablero[x, y].HasValue)
     {
+        //peque swap, utilizo coso para almacenar el valor de la casilla ya que no se si es una persona o no un ZB
+        // cambio el estado de la casilla en la que hay un coso a null
+        // 
         Estado? coso = tablero[x, y];
         tablero[x, y] = null;
         tablero[fila, columna] = coso;
@@ -235,8 +247,9 @@ void ZombieMuerte(Estado?[,] tablero, int x, int y)
     }
     
 }
-
-void ZombieContagio(Estado?[,] tablero, string[] posiciones, int x, int y)
+//la probabilidad de contagio es individual por lo tanto necesitas recorrer todas las posiciones adyacentes
+//en las que hay una persona y calcular si se ha contagiado o no
+void ZombieContagio(Estado?[,] tablero, string[] posiciones)
 {
     for (var i = 0; i < posiciones.Length; i++)
     {
@@ -245,18 +258,15 @@ void ZombieContagio(Estado?[,] tablero, string[] posiciones, int x, int y)
         int columna = int.Parse(posiciones[i].Substring(2, 1));
         if (prob >= 0 && prob < config.Contagio)
         {
-            tablero[fila, columna] = Estado.Persona;
+            tablero[fila, columna] = Estado.Zombie;
         }
     }
 }
 
 //...........................................funciones para los párametros introducidos por consola
-//controlar nulls. por hacer
 
 Configuracion InicializarConfig(string?[] args)
 {
-    var constructor = new StringBuilder();
-    
     for (var i = 0; i < args.Length; i++)
     {
         if (args[i] == null)
@@ -301,16 +311,24 @@ Configuracion InicializarConfig(string?[] args)
 
 Configuracion NuevaConfiguracion()
 {
-    bool isValid;
+    bool isValid = false;
     string? temp = "";
     do {
         WriteLine("Escribe...");
         temp = ReadLine();
-        var regex = new Regex(@"^(dimension:([0-9]{1,2}|100)\s)(infectados:([0-9]{1,2}|100)\s)(sanos:([0-9]{1,2}|100)\s)(contagio:([0-9]{1,2}|100)\s)(tiempo:([0-9]{1,2}|100)\s)(muerteZB:([0-9]{1,2}|100)\s)(matanzaZB:([0-9]{1,2}|100))$");
-        isValid = regex.IsMatch(temp);
+        if (temp != null)
+        {
+            var regex = new Regex(@"^(dimension:([0-9]{1,2}|100)\s)(infectados:([0-9]{1,2}|100)\s)(sanos:([0-9]{1,2}|100)\s)(contagio:([0-9]{1,2}|100)\s)(tiempo:([0-9]{1,2}|100)\s)(muerteZB:([0-9]{1,2}|100)\s)(matanzaZB:([0-9]{1,2}|100))$");
+            isValid = regex.IsMatch(temp);
+        }
+
+        if (temp == null)
+        {
+            isValid = false;
+        }
     } while(!isValid);
 
-    string[] array1 = temp.Split(' ');
+    string[] array1 = temp!.Split(' ');
 
     var nuevosParametros = ObtenerParametros(array1);
 
