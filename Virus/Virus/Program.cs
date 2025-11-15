@@ -6,7 +6,6 @@ using Virus.Structs;
 
 //......................................main
 // variables que necesito para funciones/procedimientos
-var random = new Random();
 
 string[] posicionesPersonas = new string[8];
 string[] posicionesZB = new string[8];
@@ -14,20 +13,20 @@ string[] posicionesVacias = new string[8];
 
 Configuracion config = InicializarConfig(args);
 
-Estado[,] leer = new Estado[config.Dimension,config.Dimension];
+Estado?[,] tablero1 = new Estado?[config.Dimension,config.Dimension];
 
-IniciarTablero(leer);
-Juego();
+IniciarTablero(tablero1);
 
-Estado[,] tablero2= new Estado[config.Dimension,config.Dimension];
-CopiarTablero(leer, tablero2);
+Estado?[,] tablero2= new Estado?[config.Dimension,config.Dimension];
+
+CopiarTablero(tablero1, tablero2);
+
+Juego(tablero1, tablero2, posicionesPersonas, posicionesZB,  posicionesVacias);
 
 
 //......................................mainFin
 
 // por hacer: control de nulls, añadir el logger
-
-//refactorizar para que se use tablero de escritura y de lectura
 
 void ImprimirTablero(Estado?[,] tablero)
 {
@@ -50,7 +49,7 @@ void ImprimirTablero(Estado?[,] tablero)
     }
 }
 
-void IniciarTablero(Estado[,] tablero)
+void IniciarTablero(Estado?[,] tablero)
 {
     int numZB = 0;
     int personas = 0;
@@ -76,7 +75,7 @@ void IniciarTablero(Estado[,] tablero)
     }
 }
 
-void CopiarTablero(Estado[,]tableroA, Estado[,]tableroB)
+void CopiarTablero(Estado?[,]tableroA, Estado?[,]tableroB)
 {
     for (var i = 0; i < tableroA.GetLength(0); i++)
     {
@@ -89,7 +88,7 @@ void CopiarTablero(Estado[,]tableroA, Estado[,]tableroB)
 
 
 
-void Juego(Estado?[,] leer, Estado?[,] escribir, string?[] posPer, string?[] posZB, string?[] posVac)
+void Juego(Estado?[,] leer, Estado?[,] escribir, string[] posPer, string[] posZB, string[] posVac)
 {
     int ciclos = 0;
 
@@ -115,6 +114,10 @@ void Juego(Estado?[,] leer, Estado?[,] escribir, string?[] posPer, string?[] pos
                         ZombieContagio(escribir, posPer, i, j);
                         Avanzar(escribir, posVac, i, j);
                     }
+                }
+                else
+                {
+                    escribir[i, j] = null;
                 }
             }
         }
@@ -157,7 +160,7 @@ string[] ObtenerPosiciones(Estado?[,] tablero, int x, int y)
     return indicesArray;
 }
 
-void DarPosiciones(Estado?[,] tablero, string?[] indices)
+void DarPosiciones(Estado?[,] tablero, string[] indices)
 {
     for(var i = 0; i<indices.Length; i++)
     {
@@ -178,7 +181,7 @@ void DarPosiciones(Estado?[,] tablero, string?[] indices)
     }
 }
 
-void Luchar(Estado?[,] tablero, string?[]posiciones)
+void Luchar(Estado?[,] tablero, string[]posiciones)
 {
     int numZB = ContarZB(tablero, posiciones);
     if (numZB > 0)
@@ -194,7 +197,7 @@ void Luchar(Estado?[,] tablero, string?[]posiciones)
     }
 }
 
-int ContarZB(Estado?[,] tablero, string?[] posiciones)
+int ContarZB(Estado?[,] tablero, string[] posiciones)
 {
     int contador = 0;
     for (var i = 0; i < posiciones.Length; i++)
@@ -209,7 +212,7 @@ int ContarZB(Estado?[,] tablero, string?[] posiciones)
     return contador;
 }
 
-void Avanzar(Estado?[,] tablero, string?[] posiciones, int x, int y)
+void Avanzar(Estado?[,] tablero, string[] posiciones, int x, int y)
 {
     int nuevaPosicion = random.Next(0, posiciones.Length-1);
     int fila = int.Parse(posicionesZB[nuevaPosicion].Substring(0, 1));
@@ -233,7 +236,7 @@ void ZombieMuerte(Estado?[,] tablero, int x, int y)
     
 }
 
-void ZombieContagio(Estado?[,] tablero, string?[] posiciones, int x, int y)
+void ZombieContagio(Estado?[,] tablero, string[] posiciones, int x, int y)
 {
     for (var i = 0; i < posiciones.Length; i++)
     {
@@ -253,19 +256,18 @@ void ZombieContagio(Estado?[,] tablero, string?[] posiciones, int x, int y)
 Configuracion InicializarConfig(string?[] args)
 {
     var constructor = new StringBuilder();
-
-    if (args.Length != 7)
-    {
-        return NuevaConfiguracion();
-    }
-
-
+    
     for (var i = 0; i < args.Length; i++)
     {
         if (args[i] == null)
         {
             return NuevaConfiguracion();
         }
+    }
+
+    if (args.Length != 7)
+    {
+        return NuevaConfiguracion();
     }
 
     var isValid = ComprobarParametros(args);
@@ -300,15 +302,13 @@ Configuracion InicializarConfig(string?[] args)
 Configuracion NuevaConfiguracion()
 {
     bool isValid;
-    string temp = "";
+    string? temp = "";
     do {
         WriteLine("Escribe...");
         temp = ReadLine();
         var regex = new Regex(@"^(dimension:([0-9]{1,2}|100)\s)(infectados:([0-9]{1,2}|100)\s)(sanos:([0-9]{1,2}|100)\s)(contagio:([0-9]{1,2}|100)\s)(tiempo:([0-9]{1,2}|100)\s)(muerteZB:([0-9]{1,2}|100)\s)(matanzaZB:([0-9]{1,2}|100))$");
         isValid = regex.IsMatch(temp);
     } while(!isValid);
-
-
 
     string[] array1 = temp.Split(' ');
 
@@ -335,7 +335,7 @@ Configuracion NuevaConfiguracion()
 
 }
 
-bool ComprobarParametros(string[] args)
+bool ComprobarParametros(string?[] args)
 {
     // añado todos los strings a un string para luego poder usar regex
     var argsEnString = string.Join(" ", args);
@@ -348,13 +348,15 @@ bool ComprobarParametros(string[] args)
 
 string[] ObtenerParametros(string?[] args)
 {
-    
     string[] nuevoArray = new string[args.Length];
 
     for (var i = 0; i < args.Length; i++)
     {
-        string valor = args[i].Split(':')[1];
-        nuevoArray[i] = valor;
+        if (args[i] != null)
+        {
+            string valor = args[i]!.Split(':')[1];
+            nuevoArray[i] = valor;
+        }
     }
     return nuevoArray;
 }
