@@ -14,18 +14,18 @@ string[] posicionesVacias = new string[8];
 
 Configuracion config = InicializarConfig(args);
 
-Estado[,] tablero1 = new Estado[config.Dimension,config.Dimension];
+Estado[,] leer = new Estado[config.Dimension,config.Dimension];
 
-IniciarTablero(tablero1);
+IniciarTablero(leer);
 Juego();
 
 Estado[,] tablero2= new Estado[config.Dimension,config.Dimension];
-CopiarTablero(tablero1, tablero2);
+CopiarTablero(leer, tablero2);
 
 
 //......................................mainFin
 
-// por hacer: funciones de los estados, control de nulls, la lógica y funciones del buffer (copiar, swap), añadir el logger
+// por hacer: control de nulls, añadir el logger
 
 //refactorizar para que se use tablero de escritura y de lectura
 
@@ -37,7 +37,7 @@ void ImprimirTablero(Estado?[,] tablero)
         {
             if (tablero[i, j] == Estado.Persona)
             {
-                Write($"[x]")
+                Write($"[x]");
             }else if (tablero[i, j] == Estado.Persona)
             {
                 Write($"[o]");
@@ -89,42 +89,51 @@ void CopiarTablero(Estado[,]tableroA, Estado[,]tableroB)
 
 
 
-void JuegoCiclo(Estado[,] tablero)
+void Juego(Estado?[,] leer, Estado?[,] escribir, string?[] posPer, string?[] posZB, string?[] posVac)
 {
     int ciclos = 0;
 
     while (ciclos < config.TiempoMax)
     {
+        ImprimirTablero(leer);
         for (var i = 0; i > config.Dimension; i++)
         {
             for (var j = 0; j > config.Dimension; j++)
             {
-                if (tablero[i, j] == Estado.Persona)
+                string[] indices = ObtenerPosiciones(leer, i, j);
+                DarPosiciones(leer, indices);
+                if (leer[i, j] == Estado.Persona)
                 {
-                    
+                    Luchar(escribir, posZB);
+                    Avanzar(escribir, posVac, i, j);
                 }
-                else if (tablero[i, j] == Estado.Zombie)
+                else if (leer[i, j] == Estado.Zombie)
                 {
-                    ZombieMuerte(tablero1, i, j);
-                    if (tablero[i, j] is Estado.Zombie)
+                    ZombieMuerte(escribir, i, j);
+                    if (escribir[i, j] is Estado.Zombie)
                     {
-                        ZombieContagio(tablero1, i, j);
+                        ZombieContagio(escribir, posPer, i, j);
+                        Avanzar(escribir, posVac, i, j);
                     }
                 }
             }
         }
 
         ciclos += 1;
-        Swap(tablero1, tablero2);
+        Swap(ref leer, ref escribir);
     } 
 
 }
 
-void Swap(Estado?[] tablero1, Estado?[] tablero2)
+//los arrays pasan por referencia cuando quieres meter el nuevo array en un contenedor
+//que apunta a otro array porque este pasa una copia del puntero
+//y por lo tanto al salir de la función seguiá apuntando al que apuntaba
+
+void Swap(ref Estado?[,] tableroA, ref Estado?[,] tableroB)
 {
-    var temp = tablero1;
-    tablero1 = tablero2;
-    tablero2 = temp;
+    var temp = tableroA;
+    tableroA = tableroB;
+    tableroB = temp;
 }
 
 string[] ObtenerPosiciones(Estado?[,] tablero, int x, int y)
@@ -148,7 +157,7 @@ string[] ObtenerPosiciones(Estado?[,] tablero, int x, int y)
     return indicesArray;
 }
 
-void DarPosiciones(Estado?[,] tablero, string[] indices)
+void DarPosiciones(Estado?[,] tablero, string?[] indices)
 {
     for(var i = 0; i<indices.Length; i++)
     {
@@ -169,19 +178,38 @@ void DarPosiciones(Estado?[,] tablero, string[] indices)
     }
 }
 
-void Luchar(Estado?[,] tablero, string[]posiciones)
+void Luchar(Estado?[,] tablero, string?[]posiciones)
 {
-    int prob = random.Next(0, 100);
-    int elegido = random.Next(0, posiciones.Length-1);
-    if (prob >= 0 && prob < config.MatanzaDeZb)
+    int numZB = ContarZB(tablero, posiciones);
+    if (numZB > 0)
     {
-        int fila = int.Parse(posiciones[elegido].Substring(0, 1));
-        int columna = int.Parse(posiciones[elegido].Substring(2, 1));
-        tablero[fila, columna] = null;
+        int prob = random.Next(0, 100);
+        int elegido = random.Next(0, posiciones.Length-1);
+        if (prob >= 0 && prob < config.MatanzaDeZb)
+        {
+            int fila = int.Parse(posiciones[elegido].Substring(0, 1));
+            int columna = int.Parse(posiciones[elegido].Substring(2, 1));
+            tablero[fila, columna] = null;
+        }
     }
 }
 
-void Avanzar(Estado?[,] tablero, string[] posiciones, int x, int y)
+int ContarZB(Estado?[,] tablero, string?[] posiciones)
+{
+    int contador = 0;
+    for (var i = 0; i < posiciones.Length; i++)
+    {
+        int fila = int.Parse(posiciones[i].Substring(0, 1));
+        int columna = int.Parse(posiciones[i].Substring(2, 1));
+        if (tablero[fila, columna] == Estado.Zombie)
+        {
+            contador += 1;
+        }
+    } 
+    return contador;
+}
+
+void Avanzar(Estado?[,] tablero, string?[] posiciones, int x, int y)
 {
     int nuevaPosicion = random.Next(0, posiciones.Length-1);
     int fila = int.Parse(posicionesZB[nuevaPosicion].Substring(0, 1));
@@ -197,7 +225,7 @@ void Avanzar(Estado?[,] tablero, string[] posiciones, int x, int y)
 
 void ZombieMuerte(Estado?[,] tablero, int x, int y)
 {
-    int prob = random(0, 100);
+    int prob = random.Next(0, 100);
     if (prob >= 0 && prob < config.MuerteZb)
     {
         tablero[x, y] = null;
@@ -205,7 +233,7 @@ void ZombieMuerte(Estado?[,] tablero, int x, int y)
     
 }
 
-void ZombieContagio(Estado?[,] tablero, string[] posiciones, int x, int y)
+void ZombieContagio(Estado?[,] tablero, string?[] posiciones, int x, int y)
 {
     for (var i = 0; i < posiciones.Length; i++)
     {
@@ -275,7 +303,7 @@ Configuracion NuevaConfiguracion()
     string temp = "";
     do {
         WriteLine("Escribe...");
-        temp = Console.ReadLine();
+        temp = ReadLine();
         var regex = new Regex(@"^(dimension:([0-9]{1,2}|100)\s)(infectados:([0-9]{1,2}|100)\s)(sanos:([0-9]{1,2}|100)\s)(contagio:([0-9]{1,2}|100)\s)(tiempo:([0-9]{1,2}|100)\s)(muerteZB:([0-9]{1,2}|100)\s)(matanzaZB:([0-9]{1,2}|100))$");
         isValid = regex.IsMatch(temp);
     } while(!isValid);
